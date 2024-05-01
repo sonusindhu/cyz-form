@@ -1,0 +1,262 @@
+import {
+    EventHandlerModel,
+    FormBuilderOptions,
+    FormFieldModel,
+    FormSettingModel,
+    FunctionType,
+    ValidationRulesModel,
+} from './models';
+
+import { environment } from './environments/environment';
+
+export function FormBuilder(
+    element: string | HTMLElement,
+    options: FormBuilderOptions,
+) {
+    let $this = this;
+    let container: HTMLElement;
+    const eventHandlers: EventHandlerModel = {};
+
+    if (typeof element === 'string') {
+        container = document.querySelector(element) as HTMLElement;
+    } else {
+        container = element;
+    }
+
+    if (!container) {
+        throw new Error(`Container not found.`);
+    }
+
+    buildForm(options);
+
+    function create(options: FormBuilderOptions) {
+        console.log(document.currentScript);
+        let element: HTMLElement | undefined = undefined;
+        if (options.selector) {
+            element =
+                typeof options.selector === 'string'
+                    ? (document.querySelector(options.selector) as HTMLElement)
+                    : options.selector;
+        } else {
+            const container = document.createElement('div');
+            container.classList.add('form-container-' + crypto.randomUUID());
+            if (document?.currentScript) {
+                element = document.currentScript.insertAdjacentElement(
+                    'afterend',
+                    container,
+                ) as HTMLElement;
+            }
+        }
+
+        if (!element) {
+            throw new Error(`Container not found.`);
+        }
+        // return new FormBuilder(element, options);
+    }
+
+    function validateInput(
+        input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement,
+        validationRules?: ValidationRulesModel,
+    ): boolean {
+        if (!validationRules) return true;
+
+        if (validationRules.required && !input.value.trim()) {
+            return false;
+        }
+
+        if (
+            validationRules.min !== undefined &&
+            parseFloat(input.value) < validationRules.min
+        ) {
+            return false;
+        }
+
+        if (
+            validationRules.max !== undefined &&
+            parseFloat(input.value) > validationRules.max
+        ) {
+            return false;
+        }
+
+        if (validationRules.pattern) {
+            const regex = new RegExp(validationRules.pattern);
+            return regex.test(input.value);
+        }
+
+        // Add more validation rules as needed
+
+        return true;
+    }
+
+    function createInputElement(
+        type: string,
+        attributes: { [key: string]: string },
+    ): HTMLInputElement {
+        const input = document.createElement('input');
+        input.setAttribute('type', type);
+        for (const key in attributes) {
+            input.setAttribute(key, attributes[key]);
+        }
+        return input;
+    }
+
+    function createTextAreaElement(attributes: {
+        [key: string]: string;
+    }): HTMLTextAreaElement {
+        const textarea = document.createElement('textarea');
+        for (const key in attributes) {
+            textarea.setAttribute(key, attributes[key]);
+        }
+        return textarea;
+    }
+
+    function createSelectElement(
+        values: { label: string; value: string }[],
+    ): HTMLSelectElement {
+        const select = document.createElement('select');
+        values.forEach((val) => {
+            const option = document.createElement('option');
+            option.setAttribute('value', val.value);
+            option.textContent = val.label;
+            select.appendChild(option);
+        });
+        return select;
+    }
+
+    function createFormElement(
+        setting: FormFieldModel,
+        form: HTMLElement,
+    ): HTMLElement | undefined {
+        const { key, label, type, values } = setting;
+        let element: HTMLElement | HTMLButtonElement | undefined;
+
+        const container = document.createElement('div'); // Create container for field
+        container.classList.add('form-field');
+
+        if (type === 'text' || type === 'number') {
+            element = createInputElement(type, { placeholder: label });
+        } else if (type === 'textarea') {
+            element = createTextAreaElement({ placeholder: label });
+        } else if (type === 'checkbox') {
+            element = createInputElement(type, { name: key });
+        } else if (type === 'checklist') {
+            // Implement createChecklistElement
+        } else if (type === 'radio') {
+            // Implement createRadioElement
+        } else if (type === 'select') {
+            element = createSelectElement(values);
+        } else if (type === 'datetime') {
+            // Code for datetime input
+        } else if (type === 'image') {
+            // Code for image input
+        } else if (type === 'button') {
+            element = document.createElement('button') as HTMLButtonElement;
+            if (element instanceof HTMLButtonElement) {
+                element.setAttribute('type', key);
+                element.textContent = label;
+                element.disabled = true;
+
+                form.appendChild(element);
+            }
+        }
+
+        if (element) {
+            container.appendChild(element);
+        }
+
+        if (element && (type === 'text' || type === 'textarea')) {
+            element.addEventListener('input', () => {
+                const inputs = Array.from(
+                    container.querySelectorAll('input, textarea, select'),
+                ) as (
+                    | HTMLInputElement
+                    | HTMLTextAreaElement
+                    | HTMLSelectElement
+                )[];
+                let isValid = true;
+                inputs.forEach(
+                    (input) =>
+                        (isValid = validateInput(input, setting.validations)),
+                );
+                const submitButton = container.querySelector(
+                    `button[type='submit']`,
+                ) as HTMLButtonElement;
+                submitButton.disabled = !isValid;
+            });
+        }
+
+        return container;
+    }
+
+    function buildForm(options: FormBuilderOptions): void {
+        const qString =
+            '?formId=' + options.formId + '&portalId=' + options.portalId;
+        const URL = environment.api_url + 'assets/settings.json' + qString;
+        // APIURL?formId=${options.formId}&portalId=${options.portalId}
+        fetch(URL)
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then((fields: FormFieldModel[]) => {
+                const payload = Object.assign({}, options, { fields });
+                createForm(payload);
+            })
+            .catch((error) => {
+                console.error(
+                    'There was a problem fetching or building the form:',
+                    error,
+                );
+            });
+    }
+
+    function createForm(settings: FormSettingModel) {
+        const form = document.createElement('form') as HTMLFormElement;
+        form.setAttribute('id', settings.formId);
+
+        settings.fields.forEach((field: FormFieldModel) => {
+            const formElement = createFormElement(field, form);
+            if (formElement) {
+                form.appendChild(formElement);
+            }
+        });
+
+        handleFormSubmit(form);
+
+        container.appendChild(form);
+    }
+
+    function handleFormSubmit(form: HTMLFormElement) {
+        form.addEventListener('submit', () => {
+            triggerEvent('beforeSubmit');
+
+            // form submit code
+
+            triggerEvent('afterSubmit');
+        });
+    }
+
+    function triggerEvent(eventName: string, ...args: FunctionType[]): void {
+        const handlers = eventHandlers[eventName];
+        if (handlers) {
+            handlers.forEach((handler) => handler(...args));
+        }
+    }
+
+    const on = (
+        eventName: string,
+        callback: (...args: FunctionType[]) => unknown,
+    ): void => {
+        if (!eventHandlers[eventName]) {
+            eventHandlers[eventName] = [];
+        }
+        eventHandlers[eventName].push(callback);
+    };
+
+    return {
+        on,
+        create,
+    };
+}

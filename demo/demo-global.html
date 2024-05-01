@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Document</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+    />
+
+    <script src="./js/form.js"></script>
+    <!-- <script src="../dist/cyz-form.new.js"></script> -->
+  </head>
+  <body>
+    <h2>Form 1</h2>
+    <!-- <div class="form-container"></div> -->
+    <script>
+      const form = CyzForm.create({
+        // selector: '.form-container',
+        formId: 'form1',
+        portalId: 'cyzerg-biz',
+      });
+    </script>
+
+    <h2>Form 2</h2>
+    <script>
+      const form2 = CyzForm.create({
+        // selector: '.form-container',
+        formId: 'form2',
+        portalId: 'tms',
+      });
+      console.log(form2);
+      form2.on('beforeSubmit', function ($event) {
+        console.log('before form submitted', $event);
+      });
+      form2.on('afterSubmit', function ($event) {
+        console.log('form has been submitted', $event);
+      });
+    </script>
+  </body>
+</html>

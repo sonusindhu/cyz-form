@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Document</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+    />
+
+    <script src="../dist/cyz-form.full.js"></script>
+  </head>
+  <body>
+    <!-- Form with Selector -->
+    <h2>Form 1 - with selector</h2>
+    <div class="my-form"></div>
+    <script>
+      const form = CyzForm.FormBuilder.create({
+        selector: '.my-form',
+        formId: '12000',
+        portalId: 'cyzerg-biz',
+      });
+      console.log(form);
+    </script>
+    <hr />
+
+    <!-- Form Without Selector -->
+    <h2>Form 2 - Without selector</h2>
+    <script>
+      const form2 = CyzForm.FormBuilder.create({
+        formId: '12001',
+        portalId: 'tms',
+      });
+      console.log(form2);
+      form2.on('init', function ($event) {
+        console.log('after form init', $event);
+      });
+      form2.on('beforeSubmit', function ($event) {
+        console.log('before form submitted', $event);
+      });
+      form2.on('afterSubmit', function ($event) {
+        console.log('form has been submitted', $event);
+      });
+    </script>
+    <hr />
+    <!-- Form Without Selector -->
+    <h2>Form 3 - New Form</h2>
+    <script>
+      CyzForm.FormBuilder.create({
+        formId: '12002',
+        portalId: 'damco',
+      });
+    </script>
+  </body>
+</html>
