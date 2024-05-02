@@ -2,13 +2,17 @@ export interface FormSettingModel extends FormBuilderOptions {
   fields: FormFieldModel[];
 }
 
+export interface FieldAttributeModel {
+  [key: string]: string;
+}
+
 export interface FormBuilderOptions {
   selector: HTMLElement | string | undefined;
   formId: string;
   portalId: string;
 }
 
-export interface FormSettingModelValue {
+export interface DropdownItemModel {
   label: string;
   value: string;
 }
@@ -18,18 +22,11 @@ export interface FormFieldModel {
   label: string;
   type: string;
   defaultValue?: string;
-  values?: FormSettingModelValue[];
+  values?: DropdownItemModel[];
   validations?: InputValidationModel[];
 }
 
-export interface ValidationRulesModel {
-  required: boolean;
-  min: number;
-  max: number;
-  pattern: RegExp | string;
-}
-
-export type FunctionType = (...args: any[]) => unknown;
+export type FunctionType = (...args: unknown[]) => unknown;
 
 export interface EventHandlerModel {
   [eventName: string]: FunctionType[];
@@ -43,4 +40,6 @@ export interface SelectOptionModel {
 export interface InputValidationModel {
   key: string;
   value: string;
+
+  message?: string;
 }

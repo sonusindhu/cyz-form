@@ -1,2 +1,2 @@
-var base = require('../dist/index.js');
+var base = require('../dist/cyz-form.js');
 console.log(base.name);

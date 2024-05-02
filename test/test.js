@@ -1,20 +1,48 @@
 var expect = require('expect.js');
 
-// ts 测试编译后文件
+// ts Test compiled files
 var base = require('../src/index.ts');
 
-describe('单元测试', function () {
+var util = require('../src/util.function.ts');
+
+describe('unit test', function () {
   this.timeout(1000);
 
-  describe('功能1', function () {
-    it('相等', function () {
-      expect(base.name).to.equal('base');
+  describe('First', function () {
+    it('equal', function () {
+      expect(base).to.equal(base);
     });
   });
 
-  describe('功能2', function () {
-    it('不相等', function () {
+  describe('Second', function () {
+    it('not equal', function () {
       expect(base.name).not.to.equal(1);
+    });
+  });
+
+  describe('Validate input', function () {
+    it('field is required', function () {
+      const isInvalid = util.validateInput('my value', [
+        { key: 'required', value: 'true' },
+      ]);
+      expect(isInvalid).to.eql(null);
+    });
+
+    it('max value - 99999', function () {
+      const isInvalid = util.validateInput('999', [
+        { key: 'max', value: '99999' },
+      ]);
+      expect(isInvalid).to.eql(null);
+    });
+
+    it('min value - 0', function () {
+      const isInvalid = util.validateInput('10', [{ key: 'min', value: '0' }]);
+      expect(isInvalid).to.eql(null);
+    });
+
+    it('Minus is not accepted', function () {
+      const isInvalid = util.validateInput('-10', [{ key: 'min', value: '0' }]);
+      expect(isInvalid).not.to.eql(null);
     });
   });
 });

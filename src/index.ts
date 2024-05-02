@@ -6,7 +6,7 @@ import {
 } from './models';
 
 import { environment } from './environments/environment';
-import { createFormElement } from './util.function';
+import { createFormElement, validateInput } from './util.function';
 
 export class FormBuilder {
   private container: HTMLElement;
@@ -29,8 +29,6 @@ export class FormBuilder {
     }
 
     this.buildForm(options);
-
-    this.triggerEvent.call(this, 'beforeInit');
   }
 
   static create(options: FormBuilderOptions) {
@@ -62,21 +60,6 @@ export class FormBuilder {
       on: form.on.bind(form),
     };
   }
-
-  // private isFormValid() {
-  //   const inputs = Array.from(
-  //     this.container.querySelectorAll('input, textarea, select'),
-  //   ) as (HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement)[];
-  //   let isValid = true;
-  //   inputs.forEach(
-  //     (input) =>
-  //       (isValid = validateInput(
-  //         input,
-  //         this.settings.find((i) => i.key == input.name)?.validations,
-  //       )),
-  //   );
-  //   return isValid;
-  // }
 
   private buildForm(options: FormBuilderOptions): void {
     const qString =
@@ -123,7 +106,7 @@ export class FormBuilder {
   }
 
   private createField(field: FormFieldModel, form: HTMLFormElement) {
-    const formElement = createFormElement(field, form);
+    const formElement = createFormElement(field);
     if (formElement) {
       form.appendChild(formElement);
     }
@@ -144,7 +127,6 @@ export class FormBuilder {
   private submitForm(payload) {
     return fetch(environment.save_url, {
       method: 'post',
-      // body: JSON.stringify(payload),
       body: payload,
     }).then((response) => {
       if (response.ok) {
@@ -162,7 +144,7 @@ export class FormBuilder {
 
       this.triggerEvent('beforeSubmit', form);
 
-      // form submit code
+      /* form submit code */
       const payload = new FormData(form);
       this.submitForm(payload)
         .then((data) => {
@@ -181,88 +163,45 @@ export class FormBuilder {
     });
   }
 
-  private validateInput(
-    input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement,
-    validationSettings?: any[],
-  ): string | null {
-    if (!validationSettings || validationSettings.length === 0) return null;
-
-    for (const validation of validationSettings) {
-      const { key, value, validationMessage } = validation;
-      let message: string | null = null;
-
-      switch (key) {
-        case 'required':
-          if (value === 'true' && !input.value.trim()) {
-            message = validationMessage || 'This field is required.';
-          }
-          break;
-        case 'maxlength':
-          if (input.value.length > parseInt(value)) {
-            message =
-              validationMessage || `Maximum length is ${value} characters.`;
-          }
-          break;
-        case 'pattern': {
-          const regex = new RegExp(value);
-          if (!regex.test(input.value)) {
-            message = validationMessage || 'Please enter a valid input.';
-          }
-          break;
-        }
-        case 'min':
-          if (parseFloat(input.value) < parseFloat(value)) {
-            message = validationMessage || `Minimum value is ${value}.`;
-          }
-          break;
-        case 'max':
-          if (parseFloat(input.value) > parseFloat(value)) {
-            message = validationMessage || `Maximum value is ${value}.`;
-          }
-          break;
-        // Add more validation rules as needed
-      }
-
-      if (message) {
-        return message;
-      }
-    }
-
-    return null;
-  }
-
-  private handleEventListner() {
+  private handleEventListner(): void {
     this.container
       .querySelectorAll('input, textarea, select')
       .forEach((field) => {
-        field.addEventListener('input', () => this.validateField(field));
-        field.addEventListener('change', () => this.validateField(field));
-        field.addEventListener('blur', () => this.validateField(field));
+        const fieldItem = field as
+          | HTMLInputElement
+          | HTMLTextAreaElement
+          | HTMLSelectElement;
+        field.addEventListener('input', () => this.validateField(fieldItem));
+        field.addEventListener('change', () => this.validateField(fieldItem));
+        field.addEventListener('blur', () => this.validateField(fieldItem));
       });
   }
 
   private validateForm(): boolean {
     let formValid = true;
-    this.container
-      .querySelectorAll('input, textarea, select')
-      .forEach((field) => {
-        if (!this.validateField(field)) {
-          formValid = false;
-        }
-      });
+    const list = this.container.querySelectorAll('input, textarea, select');
+
+    list.forEach((field) => {
+      const fieldItem = field as
+        | HTMLInputElement
+        | HTMLTextAreaElement
+        | HTMLSelectElement;
+      if (!this.validateField(fieldItem)) {
+        formValid = false;
+      }
+    });
     return formValid;
   }
 
-  validateField(field) {
+  validateField(
+    field: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement,
+  ): boolean {
     let formValid = true;
     const firstName = field.getAttribute('name');
     const settings = this.settings.find((setting) => setting.key === firstName);
     if (!settings) return true;
 
-    const errorMessage = this.validateInput(
-      field as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement,
-      settings.validations,
-    );
+    const errorMessage = validateInput(field.value, settings.validations);
     if (errorMessage) {
       formValid = false;
       const hasError = field.parentElement?.querySelector('.error');

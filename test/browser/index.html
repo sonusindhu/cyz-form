@@ -17,11 +17,11 @@
     <script>
       mocha.setup('bdd');
     </script>
-    <script src="../../dist/index.aio.js"></script>
+    <script src="../../dist/cyz-form.full.js"></script>
     <script>
       var libs = {
         'expect.js': expect,
-        '../src/index.ts': window['cyz-form'],
+        '../src/index.ts': window['CyzForm'],
       };
       var require = function (path) {
         return libs[path];
@@ -33,4 +33,3 @@
     </script>
   </body>
 </html>
-

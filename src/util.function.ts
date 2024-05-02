@@ -1,11 +1,14 @@
 import {
+  FieldAttributeModel,
   FormFieldModel,
   InputValidationModel,
   SelectOptionModel,
-  ValidationRulesModel,
 } from './models';
 
-export function createInputElement(settings: FormFieldModel, attributes) {
+export function createInputElement(
+  settings: FormFieldModel,
+  attributes: FieldAttributeModel,
+) {
   const input = document.createElement('input');
   input.setAttribute('type', settings.type);
   input.setAttribute('name', settings.key);
@@ -24,7 +27,10 @@ export function createHiddenElement(settings: FormFieldModel) {
   return input;
 }
 
-export function createCheckboxElement(settings, attributes) {
+export function createCheckboxElement(
+  settings: FormFieldModel,
+  attributes: FieldAttributeModel,
+) {
   const uniqueId = (Math.random() + 1).toString(36).substring(7);
 
   const input = document.createElement('input');
@@ -44,7 +50,10 @@ export function createCheckboxElement(settings, attributes) {
   return label;
 }
 
-export function createTextAreaElement(settings, attributes) {
+export function createTextAreaElement(
+  settings: FormFieldModel,
+  attributes: FieldAttributeModel,
+): HTMLTextAreaElement {
   const textarea = document.createElement('textarea');
   textarea.setAttribute('name', settings.key);
   for (const key in attributes) {
@@ -63,7 +72,10 @@ export function createSelectElement(
   return select;
 }
 
-export function setOption(select: HTMLSelectElement, item: SelectOptionModel) {
+export function setOption(
+  select: HTMLSelectElement,
+  item: SelectOptionModel,
+): void {
   const option = document.createElement('option');
   option.setAttribute('value', item.value);
   option.textContent = item.label;
@@ -72,7 +84,7 @@ export function setOption(select: HTMLSelectElement, item: SelectOptionModel) {
 
 export function createRadioElement(
   settings: FormFieldModel,
-  attributes,
+  attributes: FieldAttributeModel,
 ): HTMLDivElement {
   const radioContainer = document.createElement('div');
   radioContainer.classList.add('radio-group');
@@ -113,52 +125,59 @@ export function createButtonElement(settings: FormFieldModel) {
 }
 
 export function validateInput(
-  input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement,
-  validationRules?: InputValidationModel[],
-): boolean {
-  if (!validationRules || validationRules.length === 0) return true;
+  inputValue,
+  validations?: InputValidationModel[],
+): string | null {
+  if (!validations || validations.length === 0) return null;
 
-  for (const validation of validationRules) {
-    const { key, value } = validation;
+  for (const validation of validations) {
+    const { key, value, message } = validation;
+    let msg: string | null = null;
+
     switch (key) {
-      case 'required': {
-        if (value === 'true' && !input.value.trim()) {
-          return false;
+      case 'required':
+        if (value === 'true' && !inputValue.trim()) {
+          msg = message || 'This field is required.';
         }
         break;
-      }
-      case 'maxlength': {
-        if (input.value.length > parseInt(value)) {
-          return false;
+      case 'maxlength':
+        if (inputValue.length > parseInt(value)) {
+          msg = message || `Maximum length is ${value} characters.`;
         }
         break;
-      }
       case 'pattern': {
         const regex = new RegExp(value);
-        if (!regex.test(input.value)) {
-          return regex.test(input.value);
+        if (!regex.test(inputValue)) {
+          msg = message || 'Please enter a valid input.';
         }
         break;
       }
-      case 'min': {
-        if (parseFloat(input.value) < parseFloat(value)) {
-          return false;
+      case 'min':
+        if (
+          !isNaN(parseFloat(inputValue)) &&
+          parseFloat(inputValue) < parseFloat(value)
+        ) {
+          msg = message || `Minimum value is ${value}.`;
         }
         break;
-      }
-      case 'max': {
-        if (parseFloat(input.value) > parseFloat(value)) {
-          return false;
+      case 'max':
+        if (
+          !isNaN(parseFloat(inputValue)) &&
+          parseFloat(inputValue) > parseFloat(value)
+        ) {
+          msg = message || `Maximum value is ${value}.`;
         }
         break;
-      }
-      // Add more validation rules as needed
+      /* Add more validation rules as needed */
+    }
+
+    if (msg) {
+      return msg;
     }
   }
 
-  return true;
+  return null;
 }
-
 export function setValidations(
   input: HTMLInputElement | HTMLTextAreaElement | HTMLElement,
   validations?: InputValidationModel[],
@@ -173,7 +192,6 @@ export function setValidations(
 
 export function createFormElement(
   setting: FormFieldModel,
-  form: HTMLElement,
 ): HTMLElement | undefined {
   const { key, label, type } = setting;
   let element:

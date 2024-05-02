@@ -8,7 +8,7 @@
   "reporter": ["lcov", "text"],
   "extension": [".ts"],
   "include": ["src/**.ts"],
-  "exclude": ["**/*.d.ts"],
+  "exclude": ["**/*.d.ts", "src/**.spec.ts"],
   "sourceMap": true,
   "instrument": true,
   "all": true
