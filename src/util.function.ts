@@ -73,7 +73,7 @@ export function setOption(select: HTMLSelectElement, item: SelectOptionModel) {
 export function createRadioElement(
   settings: FormFieldModel,
   attributes,
-): HTMLElement {
+): HTMLDivElement {
   const radioContainer = document.createElement('div');
   radioContainer.classList.add('radio-group');
 
@@ -104,36 +104,57 @@ export function createRadioElement(
   return radioContainer;
 }
 
+export function createButtonElement(settings: FormFieldModel) {
+  const input = document.createElement('button');
+  input.setAttribute('type', settings.key);
+  input.setAttribute('name', settings.key);
+  input.textContent = settings.label;
+  return input;
+}
+
 export function validateInput(
   input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement,
-  validationRules?: ValidationRulesModel,
+  validationRules?: InputValidationModel[],
 ): boolean {
-  if (!validationRules) return true;
+  if (!validationRules || validationRules.length === 0) return true;
 
-  if (validationRules.required && !input.value.trim()) {
-    return false;
+  for (const validation of validationRules) {
+    const { key, value } = validation;
+    switch (key) {
+      case 'required': {
+        if (value === 'true' && !input.value.trim()) {
+          return false;
+        }
+        break;
+      }
+      case 'maxlength': {
+        if (input.value.length > parseInt(value)) {
+          return false;
+        }
+        break;
+      }
+      case 'pattern': {
+        const regex = new RegExp(value);
+        if (!regex.test(input.value)) {
+          return regex.test(input.value);
+        }
+        break;
+      }
+      case 'min': {
+        if (parseFloat(input.value) < parseFloat(value)) {
+          return false;
+        }
+        break;
+      }
+      case 'max': {
+        if (parseFloat(input.value) > parseFloat(value)) {
+          return false;
+        }
+        break;
+      }
+      // Add more validation rules as needed
+    }
   }
-
-  if (
-    validationRules.min !== undefined &&
-    parseFloat(input.value) < validationRules.min
-  ) {
-    return false;
-  }
-
-  if (
-    validationRules.max !== undefined &&
-    parseFloat(input.value) > validationRules.max
-  ) {
-    return false;
-  }
-
-  if (validationRules.pattern) {
-    const regex = new RegExp(validationRules.pattern);
-    return regex.test(input.value);
-  }
-
-  // Add more validation rules as needed
 
   return true;
 }
@@ -155,34 +176,38 @@ export function createFormElement(
   form: HTMLElement,
 ): HTMLElement | undefined {
   const { key, label, type } = setting;
-  let element: HTMLElement | HTMLButtonElement | undefined;
+  let element:
+    | HTMLButtonElement
+    | HTMLTextAreaElement
+    | HTMLSelectElement
+    | HTMLInputElement
+    | HTMLLabelElement
+    | HTMLDivElement
+    | undefined;
 
-  if (type === 'text' || type === 'number') {
-    element = createInputElement(setting, { placeholder: label });
-  } else if (type === 'textarea') {
-    element = createTextAreaElement(setting, { placeholder: label });
-  } else if (type === 'checkbox') {
-    element = createCheckboxElement(setting, { name: key });
-  } else if (type === 'radio') {
-    // Implement createRadioElement
-    element = createRadioElement(setting, { name: key });
-  } else if (type === 'select') {
-    element = createSelectElement(setting);
-  } else if (type === 'datetime') {
-    // Code for datetime input
-  } else if (type === 'image') {
-    // Code for image input
-  } else if (type === 'button') {
-    element = document.createElement('button');
-    if (element instanceof HTMLButtonElement) {
-      element.setAttribute('type', key);
-      element.textContent = label;
-      // element.disabled = true;
-
-      form.appendChild(element);
-    }
-  } else if (type === 'hidden') {
-    return createHiddenElement(setting);
+  switch (type) {
+    case 'text':
+    case 'number':
+      element = createInputElement(setting, { placeholder: label });
+      break;
+    case 'textarea':
+      element = createTextAreaElement(setting, { placeholder: label });
+      break;
+    case 'checkbox':
+      element = createCheckboxElement(setting, { name: key });
+      break;
+    case 'radio':
+      element = createRadioElement(setting, { name: key });
+      break;
+    case 'select':
+      element = createSelectElement(setting);
+      break;
+    case 'hidden':
+      return createHiddenElement(setting);
+      break;
+    case 'button':
+      element = createButtonElement(setting);
+      break;
   }
 
   if (element) {
@@ -192,14 +217,5 @@ export function createFormElement(
     return container;
   }
 
-  // if (element && (type === 'text' || type === 'textarea')) {
-  //   element.addEventListener('input', () => {
-  //     const formValid = this.isFormValid();
-  //     const button = this.container.querySelector(
-  //       `button[type='submit']`,
-  //     ) as HTMLButtonElement;
-  //     button.disabled = !formValid;
-  //   });
-  // }
   return;
 }

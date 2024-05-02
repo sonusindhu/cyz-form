@@ -12,7 +12,7 @@ export class FormBuilder {
   private container: HTMLElement;
   private eventHandlers: EventHandlerModel = {};
 
-  private settings!: any;
+  private settings!: FormFieldModel[];
 
   constructor(
     private element: string | HTMLElement,
@@ -132,10 +132,12 @@ export class FormBuilder {
   private createForm(settings: FormSettingModel) {
     const form = document.createElement('form') as HTMLFormElement;
     form.setAttribute('id', settings.formId);
+    form.setAttribute('novalidate', '');
     this.setupHiddenFields(settings, form);
     settings.fields.forEach((field) => this.createField(field, form));
     this.handleFormSubmit(form);
     this.container.appendChild(form);
+    this.handleEventListner();
     this.triggerEvent.call(this, 'init', { status: false, form });
   }
 
@@ -155,6 +157,9 @@ export class FormBuilder {
   private handleFormSubmit(form: HTMLFormElement) {
     form.addEventListener('submit', ($event) => {
       $event.preventDefault();
+      const formValid = this.validateForm();
+      if (!formValid) return;
+
       this.triggerEvent('beforeSubmit', form);
 
       // form submit code
@@ -176,6 +181,104 @@ export class FormBuilder {
     });
   }
 
+  private validateInput(
+    input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement,
+    validationSettings?: any[],
+  ): string | null {
+    if (!validationSettings || validationSettings.length === 0) return null;
+
+    for (const validation of validationSettings) {
+      const { key, value, validationMessage } = validation;
+      let message: string | null = null;
+
+      switch (key) {
+        case 'required':
+          if (value === 'true' && !input.value.trim()) {
+            message = validationMessage || 'This field is required.';
+          }
+          break;
+        case 'maxlength':
+          if (input.value.length > parseInt(value)) {
+            message =
+              validationMessage || `Maximum length is ${value} characters.`;
+          }
+          break;
+        case 'pattern': {
+          const regex = new RegExp(value);
+          if (!regex.test(input.value)) {
+            message = validationMessage || 'Please enter a valid input.';
+          }
+          break;
+        }
+        case 'min':
+          if (parseFloat(input.value) < parseFloat(value)) {
+            message = validationMessage || `Minimum value is ${value}.`;
+          }
+          break;
+        case 'max':
+          if (parseFloat(input.value) > parseFloat(value)) {
+            message = validationMessage || `Maximum value is ${value}.`;
+          }
+          break;
+        // Add more validation rules as needed
+      }
+
+      if (message) {
+        return message;
+      }
+    }
+
+    return null;
+  }
+
+  private handleEventListner() {
+    this.container
+      .querySelectorAll('input, textarea, select')
+      .forEach((field) => {
+        field.addEventListener('input', () => this.validateField(field));
+        field.addEventListener('change', () => this.validateField(field));
+        field.addEventListener('blur', () => this.validateField(field));
+      });
+  }
+
+  private validateForm(): boolean {
+    let formValid = true;
+    this.container
+      .querySelectorAll('input, textarea, select')
+      .forEach((field) => {
+        if (!this.validateField(field)) {
+          formValid = false;
+        }
+      });
+    return formValid;
+  }
+
+  validateField(field) {
+    let formValid = true;
+    const firstName = field.getAttribute('name');
+    const settings = this.settings.find((setting) => setting.key === firstName);
+    if (!settings) return true;
+
+    const errorMessage = this.validateInput(
+      field as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement,
+      settings.validations,
+    );
+    if (errorMessage) {
+      formValid = false;
+      const hasError = field.parentElement?.querySelector('.error');
+      if (!hasError) {
+        const errorElement = document.createElement('div');
+        errorElement.classList.add('error');
+        errorElement.style.color = '#f00';
+        errorElement.textContent = errorMessage;
+        field.parentElement?.appendChild(errorElement);
+      }
+    } else {
+      field.parentElement?.querySelector('.error')?.remove();
+    }
+    return formValid;
+  }
+
   private triggerEvent(eventName: string, ...args: unknown[]): void {
     const handlers = this.eventHandlers[eventName];
     if (handlers) {
@@ -183,7 +286,10 @@ export class FormBuilder {
     }
   }
 
-  on(eventName: string, callback: (...args: unknown[]) => unknown): void {
+  private on(
+    eventName: string,
+    callback: (...args: unknown[]) => unknown,
+  ): void {
     if (!this.eventHandlers[eventName]) {
       this.eventHandlers[eventName] = [];
     }
