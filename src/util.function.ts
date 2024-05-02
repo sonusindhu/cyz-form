@@ -68,6 +68,7 @@ export function createSelectElement(
   settings: FormFieldModel,
 ): HTMLSelectElement {
   const select = document.createElement('select');
+  select.setAttribute('name', settings.key);
   setOption(select, { value: '', label: '--Select ' + settings.label + '--' });
   settings.values?.forEach((item) => setOption(select, item));
   return select;
