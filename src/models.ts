@@ -43,3 +43,8 @@ export interface InputValidationModel {
 
   message?: string;
 }
+
+export type FormFieldTypeModel =
+  | HTMLInputElement
+  | HTMLTextAreaElement
+  | HTMLSelectElement;

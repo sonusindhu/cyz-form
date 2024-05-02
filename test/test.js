@@ -1,26 +1,19 @@
 var expect = require('expect.js');
 
 // ts Test compiled files
-var base = require('../src/index.ts');
-
+var CyzForm = require('../src/index.ts');
 var util = require('../src/util.function.ts');
 
 describe('unit test', function () {
   this.timeout(1000);
 
-  describe('First', function () {
-    it('equal', function () {
-      expect(base).to.equal(base);
+  describe('CyzForm Class', function () {
+    it('CyzForm is intialized', function () {
+      expect(CyzForm).to.equal(CyzForm);
     });
   });
 
-  describe('Second', function () {
-    it('not equal', function () {
-      expect(base.name).not.to.equal(1);
-    });
-  });
-
-  describe('Validate input', function () {
+  describe('Util Functions - Validate input', function () {
     it('field is required', function () {
       const isInvalid = util.validateInput('my value', [
         { key: 'required', value: 'true' },

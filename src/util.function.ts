@@ -1,6 +1,7 @@
 import {
   FieldAttributeModel,
   FormFieldModel,
+  FormFieldTypeModel,
   InputValidationModel,
   SelectOptionModel,
 } from './models';
@@ -179,7 +180,7 @@ export function validateInput(
   return null;
 }
 export function setValidations(
-  input: HTMLInputElement | HTMLTextAreaElement | HTMLElement,
+  input: FormFieldTypeModel,
   validations?: InputValidationModel[],
 ) {
   if (validations && validations.length > 0) {
@@ -194,14 +195,11 @@ export function createFormElement(
   setting: FormFieldModel,
 ): HTMLElement | undefined {
   const { key, label, type } = setting;
-  let element:
-    | HTMLButtonElement
-    | HTMLTextAreaElement
-    | HTMLSelectElement
-    | HTMLInputElement
+  let element!:
+    | FormFieldTypeModel
     | HTMLLabelElement
     | HTMLDivElement
-    | undefined;
+    | HTMLButtonElement;
 
   switch (type) {
     case 'text':

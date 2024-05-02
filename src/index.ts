@@ -2,6 +2,7 @@ import {
   EventHandlerModel,
   FormBuilderOptions,
   FormFieldModel,
+  FormFieldTypeModel,
   FormSettingModel,
 } from './models';
 
@@ -167,10 +168,7 @@ export class FormBuilder {
     this.container
       .querySelectorAll('input, textarea, select')
       .forEach((field) => {
-        const fieldItem = field as
-          | HTMLInputElement
-          | HTMLTextAreaElement
-          | HTMLSelectElement;
+        const fieldItem = field as FormFieldTypeModel;
         field.addEventListener('input', () => this.validateField(fieldItem));
         field.addEventListener('change', () => this.validateField(fieldItem));
         field.addEventListener('blur', () => this.validateField(fieldItem));
@@ -182,10 +180,7 @@ export class FormBuilder {
     const list = this.container.querySelectorAll('input, textarea, select');
 
     list.forEach((field) => {
-      const fieldItem = field as
-        | HTMLInputElement
-        | HTMLTextAreaElement
-        | HTMLSelectElement;
+      const fieldItem = field as FormFieldTypeModel;
       if (!this.validateField(fieldItem)) {
         formValid = false;
       }
@@ -193,9 +188,7 @@ export class FormBuilder {
     return formValid;
   }
 
-  validateField(
-    field: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement,
-  ): boolean {
+  validateField(field: FormFieldTypeModel): boolean {
     let formValid = true;
     const firstName = field.getAttribute('name');
     const settings = this.settings.find((setting) => setting.key === firstName);
