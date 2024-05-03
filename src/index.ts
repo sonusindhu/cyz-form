@@ -114,7 +114,7 @@ export class FormBuilder {
   }
 
   private createForm(settings: FormSettingModel) {
-    const form = document.createElement('form') as HTMLFormElement;
+    const form = document.createElement('form');
     form.setAttribute('id', settings.formId);
     form.setAttribute('novalidate', '');
     this.setupHiddenFields(settings, form);
@@ -122,7 +122,7 @@ export class FormBuilder {
     this.handleFormSubmit(form);
     this.container.appendChild(form);
     this.handleEventListner();
-    this.triggerEvent.call(this, 'init', { status: false, form });
+    this.triggerEvent('init', { status: true, form });
   }
 
   private submitForm(payload) {
@@ -142,26 +142,27 @@ export class FormBuilder {
       $event.preventDefault();
       const formValid = this.validateForm();
       if (!formValid) return;
-
       this.triggerEvent('beforeSubmit', form);
-
-      /* form submit code */
-      const payload = new FormData(form);
-      this.submitForm(payload)
-        .then((data) => {
-          form.reset();
-          this.triggerEvent.call(this, 'afterSubmit', {
-            data,
-            success: true,
-          });
-        })
-        .catch((error) => {
-          this.triggerEvent.call(this, 'afterSubmit', {
-            error,
-            success: false,
-          });
-        });
+      this.saveSubmission(form);
     });
+  }
+
+  private saveSubmission(form) {
+    const payload = new FormData(form);
+    this.submitForm(payload)
+      .then((data) => {
+        form.reset();
+        this.triggerEvent('afterSubmit', {
+          data,
+          success: true,
+        });
+      })
+      .catch((error) => {
+        this.triggerEvent('afterSubmit', {
+          error,
+          success: false,
+        });
+      });
   }
 
   private handleEventListner(): void {
