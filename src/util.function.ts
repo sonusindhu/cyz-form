@@ -6,13 +6,17 @@ import {
   SelectOptionModel,
 } from './models';
 
+export function getUniqueId() {
+  return (Math.random() + 1).toString(36).substring(7);
+}
+
 export function createInputElement(
   settings: FormFieldModel,
   attributes: FieldAttributeModel,
 ) {
   const input = document.createElement('input');
+  input.name = settings.key;
   input.setAttribute('type', settings.type);
-  input.setAttribute('name', settings.key);
   for (const key in attributes) {
     input.setAttribute(key, attributes[key]);
   }
@@ -22,9 +26,9 @@ export function createInputElement(
 
 export function createHiddenElement(settings: FormFieldModel) {
   const input = document.createElement('input');
-  input.setAttribute('type', settings.type);
-  input.setAttribute('name', settings.key);
+  input.name = settings.key;
   input.value = settings.defaultValue ? settings.defaultValue : '';
+  input.setAttribute('type', settings.type);
   return input;
 }
 
@@ -32,22 +36,18 @@ export function createCheckboxElement(
   settings: FormFieldModel,
   attributes: FieldAttributeModel,
 ) {
-  const uniqueId = (Math.random() + 1).toString(36).substring(7);
-
   const input = document.createElement('input');
+  input.name = settings.key;
+  input.id = getUniqueId();
   input.setAttribute('type', settings.type);
-  input.setAttribute('name', settings.key);
-  input.setAttribute('id', uniqueId);
   for (const key in attributes) {
     input.setAttribute(key, attributes[key]);
   }
   setValidations(input, settings.validations);
   const label = document.createElement('label');
-  label.setAttribute('for', uniqueId);
+  label.setAttribute('for', input.id);
   label.appendChild(input);
   label.append(settings.label);
-  // label.textContent = settings.label;
-
   return label;
 }
 
@@ -56,7 +56,7 @@ export function createTextAreaElement(
   attributes: FieldAttributeModel,
 ): HTMLTextAreaElement {
   const textarea = document.createElement('textarea');
-  textarea.setAttribute('name', settings.key);
+  textarea.name = settings.key;
   for (const key in attributes) {
     textarea.setAttribute(key, attributes[key]);
   }
@@ -68,7 +68,7 @@ export function createSelectElement(
   settings: FormFieldModel,
 ): HTMLSelectElement {
   const select = document.createElement('select');
-  select.setAttribute('name', settings.key);
+  select.name = settings.key;
   setOption(select, { value: '', label: '--Select ' + settings.label + '--' });
   settings.values?.forEach((item) => setOption(select, item));
   return select;
@@ -79,7 +79,7 @@ export function setOption(
   item: SelectOptionModel,
 ): void {
   const option = document.createElement('option');
-  option.setAttribute('value', item.value);
+  option.value = item.value;
   option.textContent = item.label;
   select.appendChild(option);
 }
@@ -97,10 +97,10 @@ export function createRadioElement(
 
   settings.values?.forEach((val, index) => {
     const input = document.createElement('input');
+    input.id = `${settings.key}-${index}`;
+    input.name = settings.key;
+    input.value = val.value;
     input.setAttribute('type', 'radio');
-    input.setAttribute('name', settings.key);
-    input.setAttribute('value', val.value);
-    input.setAttribute('id', `${settings.key}-${index}`);
 
     for (const key in attributes) {
       input.setAttribute(key, attributes[key]);
@@ -120,8 +120,8 @@ export function createRadioElement(
 
 export function createButtonElement(settings: FormFieldModel) {
   const input = document.createElement('button');
+  input.name = settings.key;
   input.setAttribute('type', settings.key);
-  input.setAttribute('name', settings.key);
   input.textContent = settings.label;
   return input;
 }
@@ -196,11 +196,7 @@ export function createFormElement(
   setting: FormFieldModel,
 ): HTMLElement | undefined {
   const { key, label, type } = setting;
-  let element!:
-    | FormFieldTypeModel
-    | HTMLLabelElement
-    | HTMLDivElement
-    | HTMLButtonElement;
+  let element!: Element;
 
   switch (type) {
     case 'text':

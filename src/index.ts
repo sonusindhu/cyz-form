@@ -115,7 +115,7 @@ export class FormBuilder {
 
   private createForm(settings: FormSettingModel) {
     const form = document.createElement('form');
-    form.setAttribute('id', settings.formId);
+    form.id = settings.formId;
     form.setAttribute('novalidate', '');
     this.setupHiddenFields(settings, form);
     settings.fields.forEach((field) => this.createField(field, form));
