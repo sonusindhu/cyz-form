@@ -7,8 +7,6 @@
 [![NPM downloads](http://img.shields.io/npm/dm/cyz-form.svg?style=flat-square)](http://www.npmtrends.com/cyz-form)
 [![Percentage of issues still open](http://isitmaintained.com/badge/open/sonusindhu/cyz-form.svg)](http://isitmaintained.com/project/sonusindhu/cyz-form 'Percentage of issues still open')
 
-The best third party `JS|TS` library scaffold.
-
 ## Characteristics
 
 - Coded in ES6+ or TypeScript, easily compile and generate production code
@@ -27,7 +25,7 @@ Unit tests guarantee support on the following environment:
 | --- | ---- | ---- | --- | ---- | ----- | ------- | ---- |
 | 11+ | 100+ | 100+ | 16+ | 100+ | 10.3+ | 4.1+    | 14+  |
 
-> Note: Compiling code depend on ES5, so you need import [es5-shim](http://github.com/es-shims/es5-shim/) to compatible with `IE6-8`, here is a [demo](./demo/from.html)
+> Here is a [demo](./demo/form.html)
 
 ## Directory
 
@@ -67,6 +65,30 @@ For browser environment:
 <script src="node_modules/cyz-form/dist/cyz-form.full.min.js"></script>
 ```
 
+For embeding form:
+
+```html
+<h2>Form 1 - With selector</h2>
+<div class="my-form"></div>
+<script>
+  const form = CyzForm.FormBuilder.create({
+    selector: '.my-form',
+    formId: 'FORM_ID_HERE', // replace Form ID
+    portalId: 'PORTAL_ID_HERE', // replace Portal ID
+  });
+  console.log(form);
+</script>
+
+<h2>Form 1 - Without selector</h2>
+<script>
+  const form = CyzForm.FormBuilder.create({
+    formId: 'FORM_ID_HERE', // replace Form ID
+    portalId: 'PORTAL_ID_HERE', // replace Portal ID
+  });
+  console.log(form);
+</script>
+```
+
 ## Documents
 
 [API](./doc/api.md)
@@ -97,12 +119,6 @@ Modify the version number in package.json, modify the version number in README.m
 
 ```bash
 $ npm run release
-```
-
-Publish the new version to NPM.
-
-```bash
-$ npm publish
 ```
 
 ## Contributors
