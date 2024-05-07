@@ -113,14 +113,6 @@ To run unit tests:
 $ npm test
 ```
 
-> Note: The browser environment needs to be tested manually under `test/browser`
-
-Modify the version number in package.json, modify the version number in README.md, modify the CHANGELOG.md, and then release the new version.
-
-```bash
-$ npm run release
-```
-
 ## Contributors
 
 [contributors](https://github.com/sonusindhu/cyz-form/graphs/contributors)
