@@ -33,8 +33,7 @@ function getCompiler(opt) {
           '@babel/preset-env',
           {
             targets: {
-              browsers:
-                'last 2 versions, > 1%, ie >= 11, Android >= 4.1, iOS >= 10.3',
+              browsers: 'last 2 versions, > 1%, Android >= 8, iOS >= 10.3',
               node: '14',
             },
             modules: false,
