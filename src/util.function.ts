@@ -1,4 +1,5 @@
 import {
+  DropdownItemModel,
   FieldAttributeModel,
   FormFieldModel,
   FormFieldTypeModel,
@@ -28,7 +29,7 @@ export function createHiddenElement(settings: FormFieldModel) {
   const input = document.createElement('input');
   input.name = settings.key;
   input.value = settings.defaultValue ? settings.defaultValue : '';
-  input.setAttribute('type', settings.type);
+  input.setAttribute('type', 'hidden');
   return input;
 }
 
@@ -192,6 +193,120 @@ export function setValidations(
   }
 }
 
+export function createCustomOptions(
+  settings: DropdownItemModel[],
+  selectedValue?,
+) {
+  const optionsItem = document.createElement('div');
+  optionsItem.classList.add('select-items');
+  settings.forEach((option) => {
+    const item = document.createElement('div');
+    item.classList.add('select-item');
+    if (selectedValue == option.value) {
+      item.classList.add('active');
+    }
+    item.textContent = option.label;
+    item.dataset.value = option.value;
+    optionsItem.appendChild(item);
+  });
+  return optionsItem;
+}
+
+export function createCustomSelect(settings: FormFieldModel) {
+  const customSelect = document.createElement('div');
+  customSelect.classList.add('custom-select');
+
+  const selected = document.createElement('div');
+  selected.classList.add('select-selected');
+  selected.textContent = settings.label;
+
+  const items = document.createElement('div');
+  items.classList.add('select-items-content');
+
+  const searchInput = document.createElement('input');
+  searchInput.setAttribute('type', 'text');
+  searchInput.classList.add('select-search');
+  searchInput.setAttribute('placeholder', 'Search...');
+  items.appendChild(searchInput);
+
+  const hiddenInput = createHiddenElement(settings);
+  setValidations(hiddenInput, settings.validations);
+  customSelect.appendChild(hiddenInput);
+
+  if (settings.values) {
+    const optionItem = createCustomOptions(settings.values);
+    optionEventLister(optionItem, items, selected, hiddenInput);
+    items.appendChild(optionItem);
+  }
+
+  selected.addEventListener('click', function (e) {
+    e.stopPropagation();
+    e.preventDefault();
+    items.classList.toggle('show');
+    function handleDocumentClick($event) {
+      const target = $event.target as Element;
+      if (items.classList.contains('show') && !items.contains(target)) {
+        searchInput.value = '';
+        items.classList.remove('show');
+        hiddenInput.dispatchEvent(new Event('change'));
+        handleItemSearch(items, searchInput, settings, hiddenInput, selected);
+      }
+    }
+    if (items.classList.contains('show')) {
+      document.addEventListener('click', handleDocumentClick);
+    } else {
+      searchInput.value = '';
+      handleItemSearch(items, searchInput, settings, hiddenInput, selected);
+      hiddenInput.dispatchEvent(new Event('change'));
+    }
+  });
+
+  searchInput.addEventListener('input', () =>
+    handleItemSearch(items, searchInput, settings, hiddenInput, selected),
+  );
+  customSelect.appendChild(selected);
+  customSelect.appendChild(items);
+  return customSelect;
+}
+
+function handleItemSearch(
+  items: HTMLDivElement,
+  searchInput: HTMLInputElement,
+  settings: FormFieldModel,
+  hiddenInput: HTMLInputElement,
+  selected: HTMLDivElement,
+) {
+  items.querySelector('.select-items')?.remove();
+  const searchText = searchInput.value.toLowerCase();
+  let list = settings.values;
+  if (searchText) {
+    list = list?.filter((i) => i.label.toLowerCase().includes(searchText));
+  }
+  if (list) {
+    const optionItem = createCustomOptions(list, hiddenInput.value);
+    optionEventLister(optionItem, items, selected, hiddenInput);
+    items.appendChild(optionItem);
+  }
+}
+
+export function optionEventLister(
+  optionItem: HTMLDivElement,
+  items: HTMLDivElement,
+  selected: HTMLDivElement,
+  hiddenInput: HTMLInputElement,
+) {
+  optionItem.addEventListener('click', function ($event) {
+    items.querySelector('.select-item.active')?.classList.remove('active');
+    const selectedItem = $event.target as HTMLElement;
+    selectedItem.classList.add('active');
+    selected.textContent = selectedItem.textContent;
+    const selectedValue = selectedItem.dataset.value;
+    hiddenInput.value = selectedValue ? selectedValue : '';
+    items.classList.remove('show');
+    hiddenInput.dispatchEvent(new Event('change'));
+  });
+}
+
 export function createFormElement(
   setting: FormFieldModel,
 ): HTMLElement | undefined {
@@ -215,6 +330,9 @@ export function createFormElement(
     case 'select':
       element = createSelectElement(setting);
       break;
+    case 'custom-select':
+      element = createCustomSelect(setting);
+      break;
     case 'hidden':
       return createHiddenElement(setting);
       break;
@@ -231,4 +349,19 @@ export function createFormElement(
   }
 
   return;
+}
+
+export function toggleErrorMessage(
+  field: FormFieldTypeModel,
+  errorMessage: string | null,
+) {
+  const formField = field.closest('.form-field');
+  formField?.querySelector('.error')?.remove();
+  if (errorMessage) {
+    const errorElement = document.createElement('div');
+    errorElement.classList.add('error');
+    errorElement.style.color = '#f00';
+    errorElement.textContent = errorMessage;
+    formField?.appendChild(errorElement);
+  }
 }

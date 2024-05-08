@@ -7,7 +7,11 @@ import {
 } from './models';
 
 import { environment } from './environments/environment';
-import { createFormElement, validateInput } from './util.function';
+import {
+  createFormElement,
+  toggleErrorMessage,
+  validateInput,
+} from './util.function';
 
 export class FormBuilder {
   private container: HTMLElement;
@@ -196,18 +200,9 @@ export class FormBuilder {
     if (!settings) return true;
 
     const errorMessage = validateInput(field.value, settings.validations);
+    toggleErrorMessage(field, errorMessage);
     if (errorMessage) {
       formValid = false;
-      const hasError = field.parentElement?.querySelector('.error');
-      if (!hasError) {
-        const errorElement = document.createElement('div');
-        errorElement.classList.add('error');
-        errorElement.style.color = '#f00';
-        errorElement.textContent = errorMessage;
-        field.parentElement?.appendChild(errorElement);
-      }
-    } else {
-      field.parentElement?.querySelector('.error')?.remove();
     }
     return formValid;
   }
