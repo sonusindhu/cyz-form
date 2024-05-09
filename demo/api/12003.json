@@ -1,0 +1,70 @@
+[
+  {
+    "key": "name",
+    "label": "Name",
+    "type": "text",
+    "validations": [
+      {
+        "key": "required",
+        "value": "true"
+      },
+      {
+        "key": "maxlength",
+        "value": "50"
+      }
+    ]
+  },
+  {
+    "key": "phoneNumber",
+    "label": "Phone Number",
+    "type": "text",
+    "validations": [
+      {
+        "key": "required",
+        "value": "true"
+      },
+      {
+        "key": "maxlength",
+        "value": "15"
+      }
+    ]
+  },
+  
+  {
+    "key": "businessEmail",
+    "label": "Business Email",
+    "type": "text",
+    "validations": [
+      {
+        "key": "required",
+        "value": "true"
+      },
+      {
+        "key": "pattern",
+        "value": "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
+      }
+    ]
+  },
+  
+  {
+    "key": "companyName",
+    "label": "Company",
+    "type": "text",
+    "validations": [
+      {
+        "key": "required",
+        "value": "true"
+      },
+      {
+        "key": "maxlength",
+        "value": "255"
+      }
+    ]
+  },  
+
+  {
+    "key": "submit",
+    "label": "Submit",
+    "type": "button"
+  }
+]

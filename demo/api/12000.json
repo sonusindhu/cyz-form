@@ -1,0 +1,157 @@
+[
+  {
+    "key": "company_name",
+    "label": "Company Name",
+    "type": "text",
+    "validations": [
+      {
+        "key": "required",
+        "value": "true"
+      },
+      {
+        "key": "maxlength",
+        "value": "50"
+      }
+    ]
+  },
+  {
+    "key": "type",
+    "label": "Type",
+    "type": "select",
+    "values": [
+      {
+        "value": "1",
+        "label": "Agent"
+      },
+      {
+        "value": "2",
+        "label": "Consignee"
+      },
+      {
+        "value": "3",
+        "label": "Shipper"
+      },
+      {
+        "value": "4",
+        "label": "Supplier"
+      },
+      {
+        "value": "5",
+        "label": "Customer"
+      },
+      {
+        "value": "6",
+        "label": "Type 1"
+      },
+      {
+        "value": "7",
+        "label": "Type 2"
+      },
+      {
+        "value": "8",
+        "label": "Type 3"
+      },
+      {
+        "value": "9",
+        "label": "Type 4"
+      },
+      {
+        "value": "10",
+        "label": "Type 5"
+      }
+    ],
+    "validations": [
+      {
+        "key": "required",
+        "value": "true"
+      }
+    ]
+  },
+  {
+    "key": "status",
+    "label": "Status",
+    "type": "select",
+    "values": [
+      {
+        "value": "1",
+        "label": "Active"
+      },
+      {
+        "value": "2",
+        "label": "Inactive"
+      }
+    ],
+    "validations": [
+      {
+        "key": "required",
+        "value": "true"
+      }
+    ]
+  },
+  {
+    "key": "invoiceNumber",
+    "label": "Invoice Number",
+    "type": "text",
+    "validations": [
+      {
+        "key": "required",
+        "value": "true"
+      },
+      {
+        "key": "pattern",
+        "value": "^[a-zA-Z0-9_]+$"
+      }
+    ]
+  },
+  {
+    "key": "approved",
+    "label": "Approved",
+    "type": "checkbox"
+  },
+  {
+    "key": "email",
+    "label": "Email",
+    "type": "text",
+    "validations": [
+      {
+        "key": "required",
+        "value": "true"
+      }
+    ]
+  },
+  {
+    "key": "description",
+    "label": "Description",
+    "type": "textarea",
+    "validations": [
+      {
+        "key": "required",
+        "value": "true"
+      }
+    ]
+  },
+  {
+    "key": "supportPhoneNumber",
+    "label": "Phone Number ",
+    "type": "text",
+    "validations": [
+      {
+        "key": "required",
+        "value": "true"
+      },
+      {
+        "key": "min",
+        "value": "10"
+      },
+      {
+        "key": "max",
+        "value": "9000"
+      }
+    ]
+  },
+  {
+    "key": "submit",
+    "label": "Submit",
+    "type": "button"
+  }
+]

@@ -1,0 +1,67 @@
+[
+  {
+    "key": "contact_name",
+    "label": "Contact Name",
+    "type": "text",
+    "validations": [
+      {
+        "key": "required",
+        "value": "true"
+      },
+      {
+        "key": "maxlength",
+        "value": "50"
+      }
+    ]
+  },
+  {
+    "key": "email",
+    "label": "Email",
+    "type": "text",
+    "validations": [
+      {
+        "key": "pattern",
+        "value": "^[a-zA-Z0-9_]+$"
+      }
+    ]
+  },  
+  {
+    "key": "phoneNumber",
+    "label": "Phone Number",
+    "type": "text"
+  },
+  {
+    "key": "jobTitle",
+    "label": "Job Title",
+    "type": "text"
+  },
+  {
+    "key": "company",
+    "label": "Company",
+    "type": "select",
+    "values": [
+      {
+        "value": "1",
+        "label": "Cyzerg India"
+      },
+      {
+        "value": "2",
+        "label": "Cyzerg LLC"
+      },
+      {
+        "value": "3",
+        "label": "Infosys Ltd"
+      },
+      {
+        "value": "4",
+        "label": "Damco LLC"
+      }
+    ]
+  },
+
+  {
+    "key": "submit",
+    "label": "Submit",
+    "type": "button"
+  }
+]

@@ -1,0 +1,99 @@
+[
+  {
+    "key": "creditor",
+    "label": "Creditor",
+    "type": "text",
+    "validations": [
+      {
+        "key": "required",
+        "value": "true"
+      },
+      {
+        "key": "maxlength",
+        "value": "50"
+      }
+    ]
+  },
+  {
+    "key": "invoiceNumber",
+    "label": "Invoice Number",
+    "type": "text",
+    "validations": [
+      {
+        "key": "pattern",
+        "value": "^[a-zA-Z0-9_]+$"
+      }
+    ]
+  },
+  {
+    "key": "approved",
+    "label": "Approved",
+    "type": "checkbox"
+  },
+  {
+    "key": "approvedBy",
+    "label": "Approved By",
+    "type": "text"
+  },
+  {
+    "key": "weight",
+    "label": "Weight",
+    "type": "number",
+    "validations": [
+      {
+        "key": "min",
+        "value": "0"
+      },
+      {
+        "key": "max",
+        "value": "99999"
+      }
+    ]
+  },
+  {
+    "key": "approverComments",
+    "label": "Approver comments",
+    "type": "textarea"
+  },
+  {
+    "key": "supportPhoneNumber",
+    "label": "Support Phone Number ",
+    "type": "text"
+  },
+  {
+    "key": "product",
+    "label": "Product",
+    "type": "radio",
+    "values": [
+      {
+        "label": "Camunda Platform",
+        "value": "camunda-platform"
+      },
+      {
+        "label": "Camunda Cloud",
+        "value": "camunda-cloud"
+      }
+    ]
+  },
+  {
+    "key": "language",
+    "label": "Language",
+    "type": "select",
+    "values": [
+      {
+        "label": "German",
+        "value": "german"
+      },
+      {
+        "label": "English",
+        "value": "english"
+      }
+    ]
+  },
+
+  {
+    "key": "submit",
+    "label": "Submit",
+    "type": "button"
+  }
+]

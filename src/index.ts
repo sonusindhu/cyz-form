@@ -69,8 +69,7 @@ export class FormBuilder {
   private buildForm(options: FormBuilderOptions): void {
     const qString =
       '?formId=' + options.formId + '&portalId=' + options.portalId;
-    const URL =
-      environment.api_url + 'assets/' + options.formId + '.json' + qString;
+    const URL = environment.api_url + options.formId + '.json' + qString;
     fetch(URL)
       .then((response) => {
         if (!response.ok) {
