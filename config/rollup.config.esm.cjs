@@ -10,6 +10,7 @@ module.exports = {
       format: 'es',
       // When export and export default are not used at the same time, set legacy to true.
       // legacy: true,
+      name: common.name,
       banner: common.banner,
       sourcemap: true,
     },
@@ -17,6 +18,7 @@ module.exports = {
       file: 'dist/cyz-form.mjs',
       format: 'es',
       // legacy: true,
+      name: common.name,
       banner: common.banner,
       sourcemap: true,
     },

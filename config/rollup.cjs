@@ -18,7 +18,7 @@ function getCompiler(opt) {
   opt = extendDeep(
     {
       tsconfigOverride: {
-        compilerOptions: { target: 'esnext', module: 'esnext' },
+        compilerOptions: { target: 'es5', module: 'esnext' },
       },
     },
     opt,
