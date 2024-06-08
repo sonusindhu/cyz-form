@@ -1,7 +1,6 @@
 let CyzForm = (function () {
-  const GET_FORM_URL = 'http://localhost:4202/';
-  const SUBMIT_URL =
-    '`https://apiqa.warehouseorchestrator.com/api/submitrequest`';
+  const FORM_URL = 'http://localhost:4202/';
+  const SUBMIT_URL = `${FORM_URL}api/submitrequest`;
   function CyzForm() {
     function validateInput(input, validationRules) {
       if (!validationRules) return true;
@@ -122,7 +121,7 @@ let CyzForm = (function () {
     async function getFormFields(options) {
       const qString =
         '?formId=' + options.formId + '&portalId=' + options.portalId;
-      const URL = GET_FORM_URL + 'assets/settings.json' + qString;
+      const URL = FORM_URL + 'assets/settings.json' + qString;
       // APIURL?formId=${options.formId}&portalId=${options.portalId}
       try {
         const response = await fetch(URL);
