@@ -70,7 +70,9 @@ export class FormBuilder {
     const qString =
       '?formId=' + options.formId + '&portalId=' + options.portalId;
     const URL = environment.api_url + options.formId + '.json' + qString;
-    fetch(URL)
+    fetch(URL, {
+      mode: 'cors',
+    })
       .then((response) => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
