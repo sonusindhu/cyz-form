@@ -213,26 +213,33 @@ export function createCustomOptions(
 }
 
 export function createCustomSelect(settings: FormFieldModel) {
+  // create container for custom select
   const customSelect = document.createElement('div');
   customSelect.classList.add('custom-select');
 
+  // create a select
   const selected = document.createElement('div');
   selected.classList.add('select-selected');
   selected.textContent = settings.label;
 
+  // create select item container
   const items = document.createElement('div');
   items.classList.add('select-items-content');
 
+  // create searchable input for select item
   const searchInput = document.createElement('input');
   searchInput.setAttribute('type', 'text');
   searchInput.classList.add('select-search');
   searchInput.setAttribute('placeholder', 'Search...');
   items.appendChild(searchInput);
 
+  // create hidden element
   const hiddenInput = createHiddenElement(settings);
+  // setup validation
   setValidations(hiddenInput, settings.validations);
   customSelect.appendChild(hiddenInput);
 
+  // create custom select item list
   if (settings.values) {
     const optionItem = createCustomOptions(settings.values);
     optionEventLister(optionItem, items, selected, hiddenInput);
