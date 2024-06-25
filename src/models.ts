@@ -10,6 +10,9 @@ export interface FormBuilderOptions {
   selector: HTMLElement | string | undefined;
   formId: string;
   portalId: string;
+
+  data?: FormFieldModel[];
+  submitUrl?: string;
 }
 
 export interface DropdownItemModel {

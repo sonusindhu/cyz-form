@@ -67,30 +67,41 @@ export class FormBuilder {
   }
 
   private buildForm(options: FormBuilderOptions): void {
-    const qString =
-      '?formId=' + options.formId + '&portalId=' + options.portalId;
-    const URL = environment.api_url + options.formId + '.json' + qString;
-    fetch(URL, {
-      mode: 'cors',
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
+    // if custom fields are provided
+    if (options?.data) {
+      this.setupForm(options, options.data);
+    }
+    // if custom fields not provided
+    else {
+      const qString =
+        '?formId=' + options.formId + '&portalId=' + options.portalId;
+      const URL = environment.api_url + options.formId + '.json' + qString;
+      fetch(URL, {
+        mode: 'cors',
       })
-      .then((fields: FormFieldModel[]) => {
-        this.settings = fields;
-        const payload = Object.assign({}, options, { fields });
-        this.createForm(payload);
-      })
-      .catch((error) => {
-        this.triggerEvent('init', { status: false, error });
-        console.error(
-          'There was a problem fetching or building the form:',
-          error,
-        );
-      });
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then((fields: FormFieldModel[]) => {
+          this.setupForm(options, fields);
+        })
+        .catch((error) => {
+          this.triggerEvent('init', { status: false, error });
+          console.error(
+            'There was a problem fetching or building the form:',
+            error,
+          );
+        });
+    }
+  }
+
+  private setupForm(options: FormBuilderOptions, fields: FormFieldModel[]) {
+    this.settings = fields;
+    const payload = Object.assign({}, options, { fields });
+    this.createForm(payload);
   }
 
   private setupHiddenFields(settings: FormSettingModel, form: HTMLFormElement) {
@@ -131,7 +142,10 @@ export class FormBuilder {
   }
 
   private submitForm(payload) {
-    return fetch(environment.save_url, {
+    const URL = this.options.submitUrl
+      ? this.options.submitUrl
+      : environment.save_url;
+    return fetch(URL, {
       method: 'post',
       body: payload,
     }).then((response) => {
@@ -194,7 +208,7 @@ export class FormBuilder {
     return formValid;
   }
 
-  validateField(field: FormFieldTypeModel): boolean {
+  private validateField(field: FormFieldTypeModel): boolean {
     let formValid = true;
     const firstName = field.getAttribute('name');
     const settings = this.settings.find((setting) => setting.key === firstName);
